@@ -1,50 +1,62 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../assets/css/main.css';
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Importation locale de Font Awesome
-import argentBankLogo from '../assets/img/argentBankLogo.png';
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const SignInPage = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { status, error } = useSelector((state) => state.auth);
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const resultAction = await dispatch(login({ email, password }));
+        if (login.fulfilled.match(resultAction)) {
+            navigate('/user');
+        }
+    };
+
     return (
         <div>
             <nav className="main-nav">
-                <Link className="main-nav-logo" to="/">
+                <a className="main-nav-logo" href="/">
                     <img
                         className="main-nav-logo-image"
-                        src={argentBankLogo}
+                        src="path/to/argentBankLogo.png"
                         alt="Argent Bank Logo"
                     />
                     <h1 className="sr-only">Argent Bank</h1>
-                </Link>
+                </a>
                 <div>
-                    <Link className="main-nav-item" to="/sign-in">
+                    <a className="main-nav-item" href="/sign-in">
                         <i className="fa fa-user-circle"></i>
                         Sign In
-                    </Link>
+                    </a>
                 </div>
             </nav>
             <main className="main bg-dark">
                 <section className="sign-in-content">
                     <i className="fa fa-user-circle sign-in-icon"></i>
                     <h1>Sign In</h1>
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="input-wrapper">
                             <label htmlFor="username">Username</label>
-                            <input type="text" id="username" />
+                            <input type="text" id="username" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="input-wrapper">
                             <label htmlFor="password">Password</label>
-                            <input type="password" id="password" />
+                            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
                         <div className="input-remember">
                             <input type="checkbox" id="remember-me" />
                             <label htmlFor="remember-me">Remember me</label>
                         </div>
-                        {/* PLACEHOLDER DUE TO STATIC SITE */}
-                        <Link to="/user" className="sign-in-button">Sign In</Link>
-                        {/* SHOULD BE THE BUTTON BELOW */}
-                        {/* <button className="sign-in-button">Sign In</button> */}
+                        <button className="sign-in-button" type="submit">Sign In</button>
                     </form>
+                    {status === 'loading' && <p>Loading...</p>}
+                    {error && <p>{error}</p>}
                 </section>
             </main>
             <footer className="footer">

@@ -1,68 +1,57 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import '../assets/css/main.css';
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Importation locale de Font Awesome
-import argentBankLogo from '../assets/img/argentBankLogo.png';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserProfile, logout } from '../auth/authSlice';
+
 
 const UserPage = () => {
+    const dispatch = useDispatch();
+    const { user, status, error } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        dispatch(getUserProfile());
+    }, [dispatch]);
+
+    const handleLogout = () => {
+        dispatch(logout());
+    };
+
+    if (status === 'loading') {
+        return <p>Loading...</p>;
+    }
+
+    if (status === 'failed') {
+        return <p>{error}</p>;
+    }
+
     return (
         <div>
             <nav className="main-nav">
-                <Link className="main-nav-logo" to="/">
+                <a className="main-nav-logo" href="/">
                     <img
                         className="main-nav-logo-image"
-                        src={argentBankLogo}
+                        src="path/to/argentBankLogo.png"
                         alt="Argent Bank Logo"
                     />
                     <h1 className="sr-only">Argent Bank</h1>
-                </Link>
+                </a>
                 <div>
-                    <Link className="main-nav-item" to="/user">
+                    <a className="main-nav-item" href="/user">
                         <i className="fa fa-user-circle"></i>
-                        Tony
-                    </Link>
-                    <Link className="main-nav-item" to="/">
+                        {user ? user.firstName : 'User'}
+                    </a>
+                    <a className="main-nav-item" href="/" onClick={handleLogout}>
                         <i className="fa fa-sign-out"></i>
                         Sign Out
-                    </Link>
+                    </a>
                 </div>
             </nav>
             <main className="main bg-dark">
                 <div className="header">
-                    <h1>Welcome back<br />Tony Jarvis!</h1>
+                    <h1>Welcome back<br />{user ? `${user.firstName} ${user.lastName}` : ''}!</h1>
                     <button className="edit-button">Edit Name</button>
                 </div>
                 <h2 className="sr-only">Accounts</h2>
-                <section className="account">
-                    <div className="account-content-wrapper">
-                        <h3 className="account-title">Argent Bank Checking (x8349)</h3>
-                        <p className="account-amount">$2,082.79</p>
-                        <p className="account-amount-description">Available Balance</p>
-                    </div>
-                    <div className="account-content-wrapper cta">
-                        <button className="transaction-button">View transactions</button>
-                    </div>
-                </section>
-                <section className="account">
-                    <div className="account-content-wrapper">
-                        <h3 className="account-title">Argent Bank Savings (x6712)</h3>
-                        <p className="account-amount">$10,928.42</p>
-                        <p className="account-amount-description">Available Balance</p>
-                    </div>
-                    <div className="account-content-wrapper cta">
-                        <button className="transaction-button">View transactions</button>
-                    </div>
-                </section>
-                <section className="account">
-                    <div className="account-content-wrapper">
-                        <h3 className="account-title">Argent Bank Credit Card (x8349)</h3>
-                        <p className="account-amount">$184.30</p>
-                        <p className="account-amount-description">Current Balance</p>
-                    </div>
-                    <div className="account-content-wrapper cta">
-                        <button className="transaction-button">View transactions</button>
-                    </div>
-                </section>
+                {/* Render account sections here */}
             </main>
             <footer className="footer">
                 <p className="footer-text">Copyright 2020 Argent Bank</p>
