@@ -21,7 +21,7 @@ export const login = createAsyncThunk('auth/login', async ({ email, password }) 
     }
     const data = await response.json();
     console.log("data: ", data)
-    localStorage.setItem('token', data.body.token);  // Store the token properly
+    localStorage.setItem('token', data.body.token); // Store the token properly
     return data;
 });
 
@@ -41,13 +41,27 @@ export const getUserProfile = createAsyncThunk('auth/getUserProfile', async () =
     return data.body;
 });
 
+export const updateUserProfile = createAsyncThunk('auth/updateUserProfile', async ({ firstName, lastName }) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:3001/api/v1/user/profile', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ firstName, lastName }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update profile');
+    }
+    const data = await response.json();
+    return data.body;
+});
+
 // Slice
 const authSlice = createSlice({
     name: 'auth',
-    initialState: {
-        status: 'idle',
-        error: null,
-    },
+    initialState,
     reducers: {
         logout: (state) => {
             state.user = null;
@@ -80,10 +94,20 @@ const authSlice = createSlice({
             .addCase(getUserProfile.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.error.message;
+            })
+            .addCase(updateUserProfile.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(updateUserProfile.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.user = action.payload;
+            })
+            .addCase(updateUserProfile.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.error.message;
             });
     },
 });
 
 export const { logout } = authSlice.actions;
-
 export default authSlice.reducer;
