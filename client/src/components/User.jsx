@@ -1,36 +1,113 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getUserProfile, logout, updateUserProfile } from '../auth/authSlice';
 import { Link } from 'react-router-dom';
-import '../assets/css/main.css';
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Importation locale de Font Awesome
-import argentBankLogo from '../assets/img/argentBankLogo.png';
 
 const UserPage = () => {
+    const dispatch = useDispatch();
+    const { user, status, error } = useSelector((state) => state.auth);
+    const [isEditing, setIsEditing] = useState(false);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+
+    useEffect(() => {
+        dispatch(getUserProfile());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (user) {
+            setFirstName(user.firstName);
+            setLastName(user.lastName);
+        }
+    }, [user]);
+
+    const handleLogout = () => {
+        dispatch(logout());
+    };
+
+    const handleEditClick = () => {
+        setIsEditing(true);
+    };
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        setFirstName(user.firstName);
+        setLastName(user.lastName);
+    };
+
+    const handleSaveEdit = async (e) => {
+        e.preventDefault();
+        try {
+            await dispatch(updateUserProfile({ firstName, lastName })).unwrap();
+            setIsEditing(false);
+        } catch (error) {
+            console.error('Failed to update profile:', error);
+        }
+    };
+
+    if (status === 'loading') {
+        return <div className="main bg-dark">Loading...</div>;
+    }
+
+    if (status === 'failed') {
+        return <div className="main bg-dark">Error: {error}</div>;
+    }
+
     return (
-        <div>
+        <>
             <nav className="main-nav">
-                <Link className="main-nav-logo" to="/">
+                <Link to="/" className="main-nav-logo">
                     <img
                         className="main-nav-logo-image"
-                        src={argentBankLogo}
+                        src="./img/argentBankLogo.png"
                         alt="Argent Bank Logo"
                     />
                     <h1 className="sr-only">Argent Bank</h1>
                 </Link>
                 <div>
-                    <Link className="main-nav-item" to="/user">
-                        <i className="fa fa-user-circle"></i>
-                        Tony
+                    <Link to="/user" className="main-nav-item">
+                        {user ? user.firstName : 'User'}
                     </Link>
-                    <Link className="main-nav-item" to="/">
-                        <i className="fa fa-sign-out"></i>
+                    <Link to="/" className="main-nav-item" onClick={handleLogout}>
                         Sign Out
                     </Link>
                 </div>
             </nav>
+
             <main className="main bg-dark">
                 <div className="header">
-                    <h1>Welcome back<br />Tony Jarvis!</h1>
-                    <button className="edit-button">Edit Name</button>
+                    {isEditing ? (
+                        <div>
+                            <h1>Edit Name</h1>
+                            <form onSubmit={handleSaveEdit}>
+                                <div className="input-wrapper">
+                                    <input
+                                        type="text"
+                                        id="firstName"
+                                        value={firstName}
+                                        onChange={(e) => setFirstName(e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        id="lastName"
+                                        value={lastName}
+                                        onChange={(e) => setLastName(e.target.value)}
+                                    />
+                                </div>
+                                <div className="button-wrapper">
+                                    <button type="submit" className="edit-button">Save</button>
+                                    <button onClick={handleCancelEdit} className="edit-button">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    ) : (
+                        <>
+                            <h1>Welcome back<br />{user ? `${user.firstName} ${user.lastName}!` : ''}</h1>
+                            <button className="edit-button" onClick={handleEditClick}>
+                                Edit Name
+                            </button>
+                        </>
+                    )}
                 </div>
                 <h2 className="sr-only">Accounts</h2>
                 <section className="account">
@@ -64,10 +141,11 @@ const UserPage = () => {
                     </div>
                 </section>
             </main>
+
             <footer className="footer">
                 <p className="footer-text">Copyright 2020 Argent Bank</p>
             </footer>
-        </div>
+        </>
     );
 };
 

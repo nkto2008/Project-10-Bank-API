@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUserProfile } from '../auth/authSlice'; // Assurez-vous que ce chemin est correct
 import '../assets/css/main.css';
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Importation locale de Font Awesome
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import argentBankLogo from '../assets/img/argentBankLogo.png';
 import iconChat from '../assets/img/icon-chat.png';
 import iconMoney from '../assets/img/icon-money.png';
 import iconSecurity from '../assets/img/icon-security.png';
 
 const HomePage = () => {
+    const dispatch = useDispatch();
+    const { user, token } = useSelector((state) => state.auth);
+
+    useEffect(() => {
+        if (token && !user) {
+            dispatch(getUserProfile());
+        }
+    }, [dispatch, token, user]);
+
     return (
         <div>
             <nav className="main-nav">
@@ -20,10 +31,17 @@ const HomePage = () => {
                     <h1 className="sr-only">Argent Bank</h1>
                 </Link>
                 <div>
-                    <Link className="main-nav-item" to="/sign-in">
-                        <i className="fa fa-user-circle"></i>
-                        Sign In
-                    </Link>
+                    {token ? (
+                        <Link className="main-nav-item" to="/user">
+                            <i className="fa fa-user-circle"></i>
+                            {user?.firstName || 'Profile'}
+                        </Link>
+                    ) : (
+                        <Link className="main-nav-item" to="/sign-in">
+                            <i className="fa fa-user-circle"></i>
+                            Sign In
+                        </Link>
+                    )}
                 </div>
             </nav>
             <main>
