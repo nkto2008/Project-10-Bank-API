@@ -5,24 +5,25 @@ info:
   version: 1.0.0
 servers:
   - url: https://api.argentbank.com/v1
+
 paths:
-  /transactions:
+  /user/{userId}/transactions:
     get:
-      summary: Récupérer les transactions de l'utilisateur
+      summary: Récupérer les transactions de l'utilisateur pour le mois en cours
       description: Retourne toutes les transactions de l'utilisateur pour le mois en cours, groupées par compte
       parameters:
-        - in: query
-          name: month
+        - in: path
+          name: userId
+          required: true
           schema:
             type: string
-          required: false
-          description: Mois pour lequel récupérer les transactions (format YYYY-MM)
+          description: ID de l'utilisateur
         - in: query
           name: accountId
           schema:
             type: string
           required: false
-          description: ID du compte spécifique pour filtrer les transactions
+          description: ID du compte spécifique pour filtrer les transactions (optionnel)
       responses:
         '200':
           description: Liste des transactions récupérée avec succès
@@ -37,11 +38,17 @@ paths:
         '404':
           description: Aucune transaction trouvée
 
-  /transactions/{transactionId}:
+  /user/{userId}/transactions/{transactionId}:
     get:
-      summary: Récupérer les détails d'une transaction
-      description: Retourne les détails d'une transaction spécifique
+      summary: Récupérer les détails d'une transaction spécifique
+      description: Retourne les détails supplémentaires d'une transaction spécifique
       parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: ID de l'utilisateur
         - in: path
           name: transactionId
           required: true
@@ -54,16 +61,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Transaction'
+                $ref: '#/components/schemas/TransactionDetails'
         '401':
           description: Non autorisé
         '404':
           description: Transaction non trouvée
 
     put:
-      summary: Modifier les informations d'une transaction
-      description: Permet de modifier les informations d'une transaction existante
+      summary: Modifier ou supprimer les informations supplémentaires d'une transaction
+      description: Permet de modifier, ajouter ou supprimer des informations supplémentaires d'une transaction existante
       parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: ID de l'utilisateur
         - in: path
           name: transactionId
           required: true
@@ -82,53 +95,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Transaction'
+                $ref: '#/components/schemas/TransactionDetails'
         '400':
           description: Données invalides fournies
         '401':
           description: Non autorisé
         '404':
           description: Transaction non trouvée
-
-    delete:
-      summary: Supprimer une transaction
-      description: Permet de supprimer une transaction existante
-      parameters:
-        - in: path
-          name: transactionId
-          required: true
-          schema:
-            type: string
-          description: ID de la transaction à supprimer
-      responses:
-        '204':
-          description: Transaction supprimée avec succès
-        '401':
-          description: Non autorisé
-        '404':
-          description: Transaction non trouvée
-
-  /transactions/new:
-    post:
-      summary: Ajouter une nouvelle transaction
-      description: Permet d'ajouter une nouvelle transaction pour l'utilisateur
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewTransaction'
-      responses:
-        '201':
-          description: Transaction créée avec succès
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Transaction'
-        '400':
-          description: Données invalides fournies
-        '401':
-          description: Non autorisé
 
 components:
   schemas:
@@ -137,57 +110,40 @@ components:
       properties:
         id:
           type: string
-        accountId:
-          type: string
         date:
           type: string
-          format: date-time
+          format: date
         description:
           type: string
         amount:
           type: number
-        balance:
-          type: number
         type:
           type: string
-          enum: [debit, credit]
+          enum: [credit, debit]
         category:
           type: string
-        notes:
-          type: string
+
+    TransactionDetails:
+      allOf:
+        - $ref: '#/components/schemas/Transaction'
+        - type: object
+          properties:
+            notes:
+              type: string
+            tags:
+              type: array
+              items:
+                type: string
 
     TransactionUpdate:
       type: object
       properties:
-        description:
-          type: string
         category:
           type: string
         notes:
           type: string
-
-    NewTransaction:
-      type: object
-      required:
-        - accountId
-        - date
-        - description
-        - amount
-        - type
-      properties:
-        accountId:
-          type: string
-        date:
-          type: string
-          format: date-time
-        description:
-          type: string
-        amount:
-          type: number
-        type:
-          type: string
-          enum: [debit, credit]
-        category:
-          type: string
-        notes:
-          type: string
+        tags:
+          type: array
+          items:
+            type: string
+      description: Pour supprimer les informations supplémentaires, envoyez des valeurs vides ou null pour les champs correspondants
