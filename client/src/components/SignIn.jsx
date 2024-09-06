@@ -2,19 +2,44 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import argentBankLogo from '../assets/img/argentBankLogo.png';
 
 const SignInPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { status, error } = useSelector((state) => state.auth);
 
+    const validateEmail = (email) => {
+        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return re.test(String(email).toLowerCase());
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const resultAction = await dispatch(login({ email, password }));
-        if (login.fulfilled.match(resultAction)) {
-            navigate('/user');
+        setEmailError('');
+        setPasswordError('');
+
+        let isValid = true;
+
+        if (!validateEmail(email)) {
+            setEmailError('Veuillez entrer une adresse e-mail valide.');
+            isValid = false;
+        }
+
+        if (password.length < 6) {
+            setPasswordError('Le mot de passe doit contenir au moins 6 caractères.');
+            isValid = false;
+        }
+
+        if (isValid) {
+            const resultAction = await dispatch(login({ email, password }));
+            if (login.fulfilled.match(resultAction)) {
+                navigate('/profile');
+            }
         }
     };
 
@@ -24,7 +49,7 @@ const SignInPage = () => {
                 <a className="main-nav-logo" href="/">
                     <img
                         className="main-nav-logo-image"
-                        src="path/to/argentBankLogo.png"
+                        src={argentBankLogo}
                         alt="Argent Bank Logo"
                     />
                     <h1 className="sr-only">Argent Bank</h1>
@@ -43,11 +68,23 @@ const SignInPage = () => {
                     <form onSubmit={handleSubmit}>
                         <div className="input-wrapper">
                             <label htmlFor="username">Username</label>
-                            <input type="text" id="username" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input
+                                type="text"
+                                id="username"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            {emailError && <p className="error-message">{emailError}</p>}
                         </div>
                         <div className="input-wrapper">
                             <label htmlFor="password">Password</label>
-                            <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            {passwordError && <p className="error-message">{passwordError}</p>}
                         </div>
                         <div className="input-remember">
                             <input type="checkbox" id="remember-me" />
@@ -56,7 +93,7 @@ const SignInPage = () => {
                         <button className="sign-in-button" type="submit">Sign In</button>
                     </form>
                     {status === 'loading' && <p>Loading...</p>}
-                    {error && <p>{error}</p>}
+                    {error && <p className="error-message">Erreur : {error}</p>}
                 </section>
             </main>
             <footer className="footer">

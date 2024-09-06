@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { getUserProfile } from '../auth/authSlice'; // Assurez-vous que ce chemin est correct
+import { getUserProfile } from '../auth/authSlice';
 import '../assets/css/main.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import argentBankLogo from '../assets/img/argentBankLogo.png';
@@ -32,7 +32,7 @@ const HomePage = () => {
                 </Link>
                 <div>
                     {token ? (
-                        <Link className="main-nav-item" to="/user">
+                        <Link className="main-nav-item" to="/profile">
                             <i className="fa fa-user-circle"></i>
                             {user?.firstName || 'Profile'}
                         </Link>
