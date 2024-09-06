@@ -1,18 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserProfile, logout, updateUserProfile } from '../auth/authSlice';
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import argentBankLogo from '../assets/img/argentBankLogo.png'
+;
 
 const UserPage = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { user, status, error } = useSelector((state) => state.auth);
     const [isEditing, setIsEditing] = useState(false);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
 
+    const token = localStorage.getItem('token')
+
+
+
     useEffect(() => {
-        dispatch(getUserProfile());
-    }, [dispatch]);
+        if (!token) {
+            navigate('/sign-in');
+        } else {
+            dispatch(getUserProfile());
+        }
+    }, [dispatch, navigate, token]);
+
+
 
     useEffect(() => {
         if (user) {
@@ -45,6 +58,10 @@ const UserPage = () => {
         }
     };
 
+    if (!token) {
+        return <Navigate to="/sign-in" />;
+    }
+
     if (status === 'loading') {
         return <div className="main bg-dark">Loading...</div>;
     }
@@ -59,7 +76,7 @@ const UserPage = () => {
                 <Link to="/" className="main-nav-logo">
                     <img
                         className="main-nav-logo-image"
-                        src="./img/argentBankLogo.png"
+                        src={argentBankLogo}
                         alt="Argent Bank Logo"
                     />
                     <h1 className="sr-only">Argent Bank</h1>
@@ -109,7 +126,9 @@ const UserPage = () => {
                         </>
                     )}
                 </div>
+                
                 <h2 className="sr-only">Accounts</h2>
+                <div>
                 <section className="account">
                     <div className="account-content-wrapper">
                         <h3 className="account-title">Argent Bank Checking (x8349)</h3>
@@ -140,6 +159,7 @@ const UserPage = () => {
                         <button className="transaction-button">View transactions</button>
                     </div>
                 </section>
+                </div>
             </main>
 
             <footer className="footer">
