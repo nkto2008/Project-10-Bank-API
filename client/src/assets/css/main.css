@@ -14,7 +14,7 @@ body {
 }
 
 .main {
-    flex: 1;
+    padding: 0 0 50px 0;
 }
 
 .bg-dark {
@@ -188,7 +188,6 @@ body {
 .input-remember label {
     margin-left: 0.25rem;
 }
-
 .input-wrapper {
     display: flex;
     flex-direction: column;
@@ -205,6 +204,50 @@ body {
     font-size: 1.2rem;
 }
 
+.form-edit-name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.input-wrapper-left {
+    display: flex;
+    flex-direction: column;
+    width: 33%;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.input-wrapper label {
+    font-weight: bold;
+}
+
+.input-wrapper-left input {
+    height: 30px;
+    width: 300px;
+}
+
+.input-wrapper-left button {
+    width: 100px;
+}
+
+.input-wrapper-right {
+    display: flex;
+    flex-direction: column;
+    width: 33%;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.input-wrapper-right input {
+    height: 30px;
+    width: 300px;
+}
+
+.input-wrapper-right button {
+    width: 100px;
+}
 .footer {
     display: flex;
     justify-content: center;
