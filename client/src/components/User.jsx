@@ -82,37 +82,40 @@ const UserPage = () => {
                     <h1 className="sr-only">Argent Bank</h1>
                 </Link>
                 <div>
+                    <i class="fa fa-user-circle"></i>
                     <Link to="/user" className="main-nav-item">
                         {user ? user.firstName : 'User'}
                     </Link>
+                    <i class="fa fa-sign-out"></i>
                     <Link to="/" className="main-nav-item" onClick={handleLogout}>
                         Sign Out
                     </Link>
                 </div>
             </nav>
 
-            <main className="main bg-dark">
-                <div className="header">
+            <main class="main bg-dark">
+                <div class="header">
                     {isEditing ? (
                         <div>
-                            <h1>Edit Name</h1>
-                            <form onSubmit={handleSaveEdit}>
-                                <div className="input-wrapper">
+                            <h1>Welcome Back</h1>
+                            <form onSubmit={handleSaveEdit} className='form-edit-name'>
+                                <div className="input-wrapper-left">
                                     <input
+                                        placeholder={firstName}
                                         type="text"
                                         id="firstName"
-                                        value={firstName}
                                         onChange={(e) => setFirstName(e.target.value)}
                                     />
+                                    <button type="submit" className="edit-button">Save</button>
+                                </div>
+                                <div className="input-wrapper-right">
                                     <input
+                                        placeholder={lastName}
                                         type="text"
                                         id="lastName"
-                                        value={lastName}
+                                        
                                         onChange={(e) => setLastName(e.target.value)}
                                     />
-                                </div>
-                                <div className="button-wrapper">
-                                    <button type="submit" className="edit-button">Save</button>
                                     <button onClick={handleCancelEdit} className="edit-button">Cancel</button>
                                 </div>
                             </form>
@@ -128,42 +131,40 @@ const UserPage = () => {
                 </div>
                 
                 <h2 className="sr-only">Accounts</h2>
-                <div>
-                <section className="account">
-                    <div className="account-content-wrapper">
-                        <h3 className="account-title">Argent Bank Checking (x8349)</h3>
-                        <p className="account-amount">$2,082.79</p>
-                        <p className="account-amount-description">Available Balance</p>
+                <section class="account">
+                    <div class="account-content-wrapper">
+                        <h3 class="account-title">Argent Bank Checking (x8349)</h3>
+                        <p class="account-amount">$2,082.79</p>
+                        <p class="account-amount-description">Available Balance</p>
                     </div>
-                    <div className="account-content-wrapper cta">
-                        <button className="transaction-button">View transactions</button>
-                    </div>
-                </section>
-                <section className="account">
-                    <div className="account-content-wrapper">
-                        <h3 className="account-title">Argent Bank Savings (x6712)</h3>
-                        <p className="account-amount">$10,928.42</p>
-                        <p className="account-amount-description">Available Balance</p>
-                    </div>
-                    <div className="account-content-wrapper cta">
-                        <button className="transaction-button">View transactions</button>
+                    <div class="account-content-wrapper cta">
+                        <button class="transaction-button">View transactions</button>
                     </div>
                 </section>
-                <section className="account">
-                    <div className="account-content-wrapper">
-                        <h3 className="account-title">Argent Bank Credit Card (x8349)</h3>
-                        <p className="account-amount">$184.30</p>
-                        <p className="account-amount-description">Current Balance</p>
+                <section class="account">
+                    <div class="account-content-wrapper">
+                        <h3 class="account-title">Argent Bank Savings (x6712)</h3>
+                        <p class="account-amount">$10,928.42</p>
+                        <p class="account-amount-description">Available Balance</p>
                     </div>
-                    <div className="account-content-wrapper cta">
-                        <button className="transaction-button">View transactions</button>
+                    <div class="account-content-wrapper cta">
+                        <button class="transaction-button">View transactions</button>
                     </div>
                 </section>
-                </div>
+                <section class="account">
+                    <div class="account-content-wrapper">
+                        <h3 class="account-title">Argent Bank Credit Card (x8349)</h3>
+                        <p class="account-amount">$184.30</p>
+                        <p class="account-amount-description">Current Balance</p>
+                    </div>
+                    <div class="account-content-wrapper cta">
+                        <button class="transaction-button">View transactions</button>
+                    </div>
+                </section>
             </main>
 
-            <footer className="footer">
-                <p className="footer-text">Copyright 2020 Argent Bank</p>
+            <footer class="footer">
+                <p class="footer-text">Copyright 2020 Argent Bank</p>
             </footer>
         </>
     );

@@ -26,13 +26,25 @@ paths:
           description: ID du compte spécifique pour filtrer les transactions (optionnel)
       responses:
         '200':
-          description: Liste des transactions récupérée avec succès
+          description: Liste des transactions récupérée avec succès, groupées par compte
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Transaction'
+                type: object
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        accountId:
+                          type: string
+                        accountType:
+                          type: string
+                        transactions:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Transaction'
         '401':
           description: Non autorisé
         '404':
@@ -68,8 +80,8 @@ paths:
           description: Transaction non trouvée
 
     put:
-      summary: Modifier ou supprimer les informations supplémentaires d'une transaction
-      description: Permet de modifier, ajouter ou supprimer des informations supplémentaires d'une transaction existante
+      summary: Modifier ou supprimer la catégorie et/ou les notes d'une transaction
+      description: Permet de modifier, ajouter ou supprimer la catégorie et/ou les notes d'une transaction existante. Les tags ne sont pas modifiables via cette route.
       parameters:
         - in: path
           name: userId
@@ -142,8 +154,4 @@ components:
           type: string
         notes:
           type: string
-        tags:
-          type: array
-          items:
-            type: string
-      description: Pour supprimer les informations supplémentaires, envoyez des valeurs vides ou null pour les champs correspondants
+      description: Pour supprimer les informations, envoyez une chaîne vide ou null pour les champs correspondants. Les tags ne sont pas modifiables via cette route.
